@@ -1,122 +1,62 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { StudyRecords } from "./components/studyRecords";
+import { AddButton } from "./components/AddButton";
+import { DisplayRecords } from "./components/displayRecords";
+import { InputContents } from "./components/InputContents";
+import { InputTime } from "./components/InputTime";
 
-function App() {
-  const [count, setCount] = useState(0)
+export const App = () => {
+  const [contents, setContents] = useState("");
+  const [time, setTime] = useState(0);
+  const [records, setRecords] = useState([]);
+  const [hasError, setHasError] = useState(true);
+
+  const handleContentsChange = (e) => {
+    const value = e.target.value;
+    setContents(value);
+    validateForm(value, time);
+  };
+
+  const handleTimeChange = (e) => {
+    const value = Number(e.target.value);
+    setTime(value);
+    validateForm(value, contents);
+  };
+
+  const handleAddRecord = (contents, time) => {
+    setRecords([...records, { title: contents, time: time }]);
+    setContents("");
+    setTime(0);
+  };
+
+  const validateForm = (contents, time) => {
+    if (contents === "" || time === 0 || time === "") {
+      setHasError(true);
+    } else {
+      setHasError(false);
+    }
+  };
+
+  const totalTime = records.reduce((total, record) => {
+    return total + record.time;
+  }, 0);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
-}
-
-export default App
+    <div>
+      <h1>学習記録一覧</h1>
+      <InputContents
+        contents={contents}
+        onChange={handleContentsChange}
+      />
+      <InputTime time={time} onChange={handleTimeChange} />
+      <DisplayRecords contents={contents} time={time} />
+      <AddButton
+        contents={contents}
+        time={time}
+        hasError={hasError}
+        onAdd={handleAddRecord}
+      />
+      <StudyRecords hasError={hasError} records={records} totalTime={totalTime} />
+    </div>
+  );
+};
